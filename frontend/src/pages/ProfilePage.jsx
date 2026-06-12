@@ -61,39 +61,14 @@ export default function ProfilePage() {
         <h2>Posted Gigs</h2>
         <div className="grid">
           {postedGigs.map((gig) => (
-            <article className="card gig-card" key={gig._id}>
-              <div className="gig-card__header">
-                <span className="pill">{gig.category}</span>
-                <span className={`status status--${gig.status}`}>{gig.status}</span>
-              </div>
-              <h3>{gig.title}</h3>
-              <p>{gig.description}</p>
-              <div className="gig-meta">
-                <strong>${gig.budget}</strong>
-                <span>{gig.type}</span>
-              </div>
-
-              <div className="applicant-list">
-                <h4>Applicants</h4>
-                {gig.applicants.length === 0 ? (
-                  <p className="muted">No applicants yet.</p>
-                ) : (
-                  gig.applicants.map((applicant) => (
-                    <div className="applicant-row" key={applicant._id}>
-                      <span>
-                        {applicant.name} - {applicant.city}
-                      </span>
-                      {gig.status === 'open' ? (
-                        <button className="ghost-button" onClick={() => selectApplicant(gig._id, applicant._id)} type="button">
-                          Select
-                        </button>
-                      ) : null}
-                    </div>
-                  ))
-                )}
-                {gig.selectedApplicant ? <p className="success-text">Selected: {gig.selectedApplicant.name}</p> : null}
-              </div>
-            </article>
+            <GigCard
+              key={gig._id}
+              gig={gig}
+              showApply={false}
+              showApplicants
+              onSelect={selectApplicant}
+              selectedApplicantLabel={gig.selectedApplicant?.name}
+            />
           ))}
         </div>
       </section>

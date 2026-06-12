@@ -6,6 +6,7 @@ export default function SignupPage() {
   const navigate = useNavigate();
   const { signup } = useAuth();
   const [loadingLocation, setLoadingLocation] = useState(true);
+  const [geoFallback, setGeoFallback] = useState(false);
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -32,10 +33,11 @@ export default function SignupPage() {
             lng: position.coords.longitude
           }
         }));
+        setGeoFallback(false);
         setLoadingLocation(false);
       },
       () => {
-        setError('Location access is required to create a local profile.');
+        setGeoFallback(true);
         setLoadingLocation(false);
       },
       { enableHighAccuracy: true, timeout: 10000 }
@@ -46,12 +48,6 @@ export default function SignupPage() {
     event.preventDefault();
     setLoading(true);
     setError('');
-
-    if (!form.location) {
-      setError('Wait for geolocation to finish or allow location access.');
-      setLoading(false);
-      return;
-    }
 
     try {
       await signup(form);
@@ -109,10 +105,12 @@ export default function SignupPage() {
           />
         </label>
 
-        {loadingLocation ? <p className="muted">Requesting your location...</p> : <p className="muted">Location captured.</p>}
+        {loadingLocation ? <p className="muted">Requesting your location...</p> : null}
+        {form.location ? <p className="muted">Location captured from your browser.</p> : null}
+        {geoFallback ? <p className="muted">Location permission was denied. We will geocode your city instead.</p> : null}
         {error ? <p className="error-text">{error}</p> : null}
 
-        <button className="primary-button" disabled={loading || loadingLocation} type="submit">
+        <button className="primary-button" disabled={loading || loadingLocation && !geoFallback} type="submit">
           {loading ? 'Creating account...' : 'Sign up'}
         </button>
       </form>
